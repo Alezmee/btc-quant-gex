@@ -1,0 +1,16 @@
+# Datos generados: no versionar, se regeneran solos en cada corrida
+data/*
+
+# EXCEPCIÓN: sí queremos versionar el histórico acumulativo
+# (es lo único que el workflow de GitHub Actions necesita commitear)
+!data/historico_snapshots.csv
+!data/forward_test_resultados.csv
+
+# Otras carpetas generadas
+logs/
+reporte/graficos/
+reporte/datos_reporte.json
+reporte/reporte_btc_gex.docx
+__pycache__/
+*.pyc
+node_modules/

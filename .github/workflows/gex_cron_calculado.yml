@@ -1,0 +1,46 @@
+name: Calcular agregado GEX BTC desde crudo
+
+on:
+  schedule:
+    - cron: '0 9 * * *'   # 1 vez al dia alcanza, ya que procesa TODO lo nuevo acumulado
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  calcular:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar repo de calculo
+        uses: actions/checkout@v4
+
+      - name: Clonar repo crudo (publico, solo lectura)
+        uses: actions/checkout@v4
+        with:
+          repository: Alezmee/btc-quant-gex-raw
+          path: raw_repo
+
+      - name: Instalar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Instalar dependencias
+        run: pip install pandas pyarrow requests
+
+      - name: Recalcular agregado desde crudo
+        run: python calcular_desde_crudo.py --raw-dir ./raw_repo/data/raw
+
+      - name: Correr forward-test
+        run: python evaluar_forward_test.py --horizonte-horas 24 --umbral-pct 2.0
+
+      - name: Commitear resultados
+        run: |
+          git config user.name "gex-calc-bot"
+          git config user.email "gex-calc-bot@users.noreply.github.com"
+          git add data/historico_snapshots.csv data/forward_test_resultados.csv
+          git diff --cached --quiet && echo "Sin cambios para commitear" && exit 0
+          git commit -m "Recalculo agregado + forward-test $(date -u +'%Y-%m-%d')"
+          git pull --rebase origin main
+          git push

@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BTC Options Terminal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0A0F14;
+    --surface: #121A22;
+    --surface-2: #1A2530;
+    --border: #263241;
+    --text-primary: #E8ECEF;
+    --text-secondary: #8A9AAA;
+    --text-faint: #56636F;
+    --accent-long: #2DD4BF;
+    --accent-short: #FB7185;
+    --accent-neutral: #F2B84B;
+    --font-display: 'Sora', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+    --font-body: 'IBM Plex Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    line-height: 1.5;
+  }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 28px 24px 60px; }
+
+  /* ---------- Header ---------- */
+  header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 22px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 28px;
+  }
+
+  .brand {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.14em;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+  }
+
+  .brand span { color: var(--accent-long); }
+
+  .spot-block { display: flex; align-items: baseline; gap: 14px; margin-top: 6px; }
+
+  .spot-price {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 40px;
+    letter-spacing: -0.01em;
+  }
+
+  .badge {
+    font-family: var(--font-display);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 100px;
+    border: 1px solid;
+  }
+  .badge.long { color: var(--accent-long); border-color: var(--accent-long); background: rgba(45,212,191,0.08); }
+  .badge.short { color: var(--accent-short); border-color: var(--accent-short); background: rgba(251,113,133,0.08); }
+
+  .header-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+  .meta { font-family: var(--font-mono); font-size: 12px; color: var(--text-faint); margin-top: 4px; }
+
+  input[type=number] {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    width: 90px;
+  }
+
+  button {
+    font-family: var(--font-display);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 9px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: border-color .15s ease, color .15s ease;
+  }
+  button:hover { border-color: var(--accent-long); color: var(--accent-long); }
+  button.primary { background: var(--accent-long); border-color: var(--accent-long); color: #06211D; }
+  button.primary:hover { color: #06211D; opacity: 0.9; }
+  button:disabled { opacity: 0.4; cursor: default; }
+
+  /* ---------- Level strip (signature element) ---------- */
+  .levels-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 26px 28px 20px;
+    margin-bottom: 24px;
+  }
+  .levels-title {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 22px;
+  }
+  .strip-track {
+    position: relative;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent-short), var(--border) 45%, var(--border) 55%, var(--accent-long));
+    border-radius: 4px;
+    margin: 30px 12px 40px;
+  }
+  .strip-point {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    white-space: nowrap;
+  }
+  .strip-point .dot {
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--surface); border: 2px solid var(--text-faint);
+    margin: 0 auto 8px;
+  }
+  .strip-point.spot .dot { width: 16px; height: 16px; border-color: var(--text-primary); background: var(--text-primary); box-shadow: 0 0 0 4px rgba(232,236,239,0.15); }
+  .strip-point.wall .dot { border-color: var(--accent-neutral); }
+  .strip-point .label { font-size: 10px; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.05em; font-family: var(--font-display); }
+  .strip-point .value { font-family: var(--font-mono); font-size: 13px; color: var(--text-primary); margin-top: 2px; }
+  .strip-point.spot .value { color: var(--text-primary); font-weight: 600; }
+
+  /* ---------- Metric grid ---------- */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  .metric-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+  }
+  .metric-label {
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+  }
+  .metric-value { font-family: var(--font-mono); font-size: 22px; font-weight: 600; }
+  .metric-sub { font-family: var(--font-mono); font-size: 11px; color: var(--text-faint); margin-top: 4px; }
+  .pos { color: var(--accent-long); }
+  .neg { color: var(--accent-short); }
+
+  /* ---------- Score bars ---------- */
+  .score-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-bottom: 24px; }
+  .score-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; }
+  .score-title { font-family: var(--font-display); font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px; }
+  .bar-track { height: 8px; background: var(--surface-2); border-radius: 6px; position: relative; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 6px; background: var(--accent-long); }
+  .bar-track.bipolar { background: var(--surface-2); }
+  .bar-center-mark { position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1px; background: var(--text-faint); }
+  .score-value { font-family: var(--font-mono); font-size: 14px; margin-top: 10px; color: var(--text-primary); }
+
+  /* ---------- Charts ---------- */
+  .chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  @media (max-width: 860px) { .chart-row { grid-template-columns: 1fr; } }
+  .chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; }
+  .chart-card h3 { font-family: var(--font-display); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-secondary); margin: 0 0 14px; }
+  canvas { max-height: 260px; }
+
+  footer { font-size: 12px; color: var(--text-faint); border-top: 1px solid var(--border); padding-top: 18px; margin-top: 8px; }
+
+  #estado { font-family: var(--font-mono); font-size: 12px; color: var(--text-faint); text-align: center; padding: 40px 0; }
+  #estado.error { color: var(--accent-short); }
+  #contenido { display: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <div class="brand">BTC <span>OPTIONS</span> TERMINAL</div>
+      <div class="spot-block">
+        <div class="spot-price" id="spot-price">—</div>
+        <div class="badge" id="badge-regimen">—</div>
+      </div>
+      <div class="meta" id="meta-actualizado">sin datos aún</div>
+    </div>
+    <div class="header-actions">
+      <label style="font-family: var(--font-mono); font-size: 11px; color: var(--text-faint);">
+        instrumentos<br>
+        <input type="number" id="input-instrumentos" value="100" min="1" max="1000">
+      </label>
+      <button id="btn-actualizar" class="primary">Actualizar</button>
+      <button id="btn-reporte">Descargar reporte Word</button>
+    </div>
+  </header>
+
+  <div id="estado">conectando con el backend en <span id="api-base-mostrado"></span>…</div>
+
+  <div id="contenido">
+
+    <div class="levels-card">
+      <div class="levels-title">Niveles de gamma</div>
+      <div class="strip-track" id="strip-track"></div>
+    </div>
+
+    <div class="grid" id="metric-grid"></div>
+
+    <div class="score-row" id="score-row"></div>
+
+    <div class="chart-row">
+      <div class="chart-card">
+        <h3>GEX por strike</h3>
+        <canvas id="chart-strike"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>Perfil de GEX simulado</h3>
+        <canvas id="chart-perfil"></canvas>
+      </div>
+    </div>
+
+    <footer>
+      Convención: el signo de GEX/DEX asume que los dealers están del lado contrario al open interest
+      neto de cada strike (supuesto estándar de la industria, no un dato confirmado). El flip point se
+      estima con IV de mercado fija. Esto es información descriptiva, no una recomendación de inversión.
+    </footer>
+
+  </div>
+</div>
+
+<script>
+const API_BASE = window.location.hostname === "" || window.location.protocol === "file:"
+  ? "http://127.0.0.1:8000"
+  : "";
+document.getElementById("api-base-mostrado").textContent = API_BASE || "(mismo origen)";
+
+const fmt = (n, dec = 0) => Number(n).toLocaleString("en-US", { maximumFractionDigits: dec, minimumFractionDigits: dec });
+const fmtUsd = (n) => `$${fmt(n, 0)}`;
+
+let chartStrike = null;
+let chartPerfil = null;
+
+async function cargarAnalisis() {
+  const maxInstrumentos = document.getElementById("input-instrumentos").value || 100;
+  const estado = document.getElementById("estado");
+  const contenido = document.getElementById("contenido");
+  const btn = document.getElementById("btn-actualizar");
+
+  estado.style.display = "block";
+  estado.classList.remove("error");
+  estado.textContent = "consultando Deribit y calculando GEX/DEX/Charm/Vanna/Volga…";
+  contenido.style.display = "none";
+  btn.disabled = true;
+
+  try {
+    const r = await fetch(`${API_BASE}/api/v1/gex?max_instrumentos=${maxInstrumentos}`);
+    if (!r.ok) {
+      const detalle = await r.json().catch(() => ({}));
+      throw new Error(detalle.detail || `Error ${r.status}`);
+    }
+    const a = await r.json();
+    render(a);
+    estado.style.display = "none";
+    contenido.style.display = "block";
+  } catch (e) {
+    estado.classList.add("error");
+    estado.textContent = `No se pudo cargar el análisis: ${e.message}. ¿Está corriendo el backend (uvicorn main:app)?`;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function render(a) {
+  const esLong = a.gex_total > 0;
+
+  document.getElementById("spot-price").textContent = fmtUsd(a.spot);
+  const badge = document.getElementById("badge-regimen");
+  badge.textContent = esLong ? "Long Gamma" : "Short Gamma";
+  badge.className = "badge " + (esLong ? "long" : "short");
+  document.getElementById("meta-actualizado").textContent = "actualizado " + new Date().toLocaleString();
+
+  renderStrip(a);
+  renderMetricas(a, esLong);
+  renderScores(a);
+  renderCharts(a);
+}
+
+function renderStrip(a) {
+  const track = document.getElementById("strip-track");
+  track.innerHTML = "";
+
+  const puntos = [
+    { label: "Put wall", valor: a.muros.put_wall, tipo: "wall" },
+    { label: "Soporte", valor: a.muros.soporte_cercano, tipo: "normal" },
+    { label: "Flip point", valor: a.flip_point, tipo: "normal" },
+    { label: "Spot", valor: a.spot, tipo: "spot" },
+    { label: "Resistencia", valor: a.muros.resistencia_cercana, tipo: "normal" },
+    { label: "Call wall", valor: a.muros.call_wall, tipo: "wall" },
+  ].filter(p => p.valor !== null && p.valor !== undefined);
+
+  const valores = puntos.map(p => p.valor);
+  const min = Math.min(...valores);
+  const max = Math.max(...valores);
+  const rango = (max - min) || 1;
+
+  puntos.forEach(p => {
+    const pctRaw = ((p.valor - min) / rango) * 100;
+    const pct = Math.min(96, Math.max(4, pctRaw)); // margen para que no se corten las etiquetas
+    const div = document.createElement("div");
+    div.className = "strip-point " + p.tipo;
+    div.style.left = pct + "%";
+    div.innerHTML = `<div class="dot"></div><div class="label">${p.label}</div><div class="value">${fmtUsd(p.valor)}</div>`;
+    track.appendChild(div);
+  });
+}
+
+function renderMetricas(a, esLong) {
+  const grid = document.getElementById("metric-grid");
+  const claseColorFn = (v) => v >= 0 ? "pos" : "neg";
+
+  const tarjetas = [
+    { label: "DEX neto", value: `${fmt(a.dex.btc_total, 1)} BTC`, sub: `~ ${fmtUsd(a.dex.usd_total)}`, clase: claseColorFn(a.dex.btc_total) },
+    { label: "Vega neta", value: fmt(a.vega_total, 1), sub: "exposición a IV", clase: "" },
+    { label: "CharmEX total", value: `${fmt(a.charm.total, 1)} BTC/día`, sub: "decaimiento de delta", clase: claseColorFn(a.charm.total) },
+    { label: "VannaEX total", value: `${fmt(a.vanna.total, 2)} BTC/pto IV`, sub: "sensibilidad a IV", clase: claseColorFn(a.vanna.total) },
+    { label: "Ratio Volga/Vega", value: fmt(a.score.ratio_volga_vega, 2), sub: a.score.ratio_volga_vega > 1 ? "convexidad alta" : "convexidad moderada", clase: "" },
+  ];
+
+  grid.innerHTML = tarjetas.map(t => `
+    <div class="metric-card">
+      <div class="metric-label">${t.label}</div>
+      <div class="metric-value ${t.clase}">${t.value}</div>
+      <div class="metric-sub">${t.sub}</div>
+    </div>
+  `).join("");
+}
+
+function renderScores(a) {
+  const row = document.getElementById("score-row");
+  const s = a.score;
+
+  const confianza = Math.max(0, Math.min(100, s.confianza_regimen));
+  const sesgoPct = Math.max(-100, Math.min(100, s.sesgo_score));
+  const riesgo = Math.max(0, Math.min(100, s.riesgo_aceleracion));
+
+  row.innerHTML = `
+    <div class="score-card">
+      <div class="score-title">Régimen: ${s.tipo_regimen}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${confianza}%; background: var(--accent-long);"></div></div>
+      <div class="score-value">Confianza: ${fmt(confianza,0)} / 100</div>
+    </div>
+    <div class="score-card">
+      <div class="score-title">Sesgo direccional</div>
+      <div class="bar-track bipolar">
+        <div class="bar-center-mark"></div>
+        <div class="bar-fill" style="width:${Math.abs(sesgoPct)/2}%; margin-left:${sesgoPct >= 0 ? '50%' : (50 - Math.abs(sesgoPct)/2) + '%'}; background: ${sesgoPct >= 0 ? 'var(--accent-long)' : 'var(--accent-short)'};"></div>
+      </div>
+      <div class="score-value">${sesgoPct > 0 ? '+' : ''}${fmt(sesgoPct,0)} · ${s.sesgo_alineado ? 'DEX y Vanna confirman' : 'sin confirmación de Vanna'}</div>
+    </div>
+    <div class="score-card">
+      <div class="score-title">Riesgo de aceleración (Volga/Vega)</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${riesgo}%; background: var(--accent-neutral);"></div></div>
+      <div class="score-value">Percentil ${fmt(riesgo,0)} / 100</div>
+    </div>
+  `;
+}
+
+function renderCharts(a) {
+  const ctxStrike = document.getElementById("chart-strike").getContext("2d");
+  const ctxPerfil = document.getElementById("chart-perfil").getContext("2d");
+
+  const gridColor = "rgba(255,255,255,0.05)";
+  const tickColor = "#8A9AAA";
+
+  if (chartStrike) chartStrike.destroy();
+  chartStrike = new Chart(ctxStrike, {
+    type: "bar",
+    data: {
+      labels: a.por_strike.map(f => fmt(f.strike, 0)),
+      datasets: [{
+        data: a.por_strike.map(f => f.gex_contrib),
+        backgroundColor: a.por_strike.map(f => f.gex_contrib >= 0 ? "#2DD4BF" : "#FB7185"),
+        borderRadius: 3,
+      }],
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: tickColor, font: { family: "IBM Plex Mono", size: 10 }, maxRotation: 60 }, grid: { color: gridColor } },
+        y: { ticks: { color: tickColor, font: { family: "IBM Plex Mono", size: 10 } }, grid: { color: gridColor } },
+      },
+    },
+  });
+
+  if (chartPerfil) chartPerfil.destroy();
+  chartPerfil = new Chart(ctxPerfil, {
+    type: "line",
+    data: {
+      labels: a.perfil_gex.map(f => fmt(f.spot_hipotetico, 0)),
+      datasets: [{
+        data: a.perfil_gex.map(f => f.gex_total),
+        borderColor: "#2DD4BF",
+        backgroundColor: "rgba(45,212,191,0.08)",
+        fill: true,
+        pointRadius: 0,
+        tension: 0.15,
+      }],
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: tickColor, font: { family: "IBM Plex Mono", size: 10 }, maxRotation: 60 }, grid: { color: gridColor } },
+        y: { ticks: { color: tickColor, font: { family: "IBM Plex Mono", size: 10 } }, grid: { color: gridColor } },
+      },
+    },
+  });
+}
+
+document.getElementById("btn-actualizar").addEventListener("click", cargarAnalisis);
+document.getElementById("btn-reporte").addEventListener("click", () => {
+  const maxInstrumentos = document.getElementById("input-instrumentos").value || 100;
+  window.location.href = `${API_BASE}/api/v1/download-report?max_instrumentos=${maxInstrumentos}`;
+});
+
+cargarAnalisis();
+</script>
+</body>
+</html>

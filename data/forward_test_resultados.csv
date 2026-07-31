@@ -1,0 +1,4 @@
+timestamp_señal,spot_inicial,spot_futuro,cambio_pct,tipo_regimen,confianza_regimen,sesgo_score,resultado_esperado,resultado_real,acierto,fuente_precio_futuro
+2026-07-24 05:33:58.506487+00:00,65258.27,64714.95,-0.8325688069879874,RANGO / REVERSIÓN (long gamma),50.0,75.0,rango_sostenido,rango_sostenido,True,precio_actual_api
+2026-07-24 05:36:40.216337+00:00,65231.21,64714.95,-0.7914309729959049,RANGO / REVERSIÓN (long gamma),41.66666666666666,66.66666666666666,rango_sostenido,rango_sostenido,True,precio_actual_api
+,64831.84,64714.95,-0.18029721198719553,RANGO / REVERSION (long gamma),75.0,75.0,rango_sostenido,rango_sostenido,True,precio_actual_api

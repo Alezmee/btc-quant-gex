@@ -37,24 +37,34 @@ function filaTabla(etiqueta, valor, esHeader = false) {
   });
 }
 
+function fmtNum(valor, decimales = 0) {
+  if (valor === null || valor === undefined) return "N/D";
+  return Number(valor).toLocaleString("en-US", { maximumFractionDigits: decimales, minimumFractionDigits: decimales });
+}
+
+function fmtUsd(valor, decimales = 0) {
+  if (valor === null || valor === undefined) return "no disponible en esta muestra";
+  return `$${fmtNum(valor, decimales)}`;
+}
+
 function tablaMetricas() {
   return new Table({
     columnWidths: [4500, 4500],
     width: { size: 9000, type: WidthType.DXA },
     rows: [
       filaTabla("Métrica", "Valor", true),
-      filaTabla("Spot BTC", `$${a.spot.toLocaleString("en-US", { maximumFractionDigits: 0 })}`),
+      filaTabla("Spot BTC", fmtUsd(a.spot)),
       filaTabla("Régimen GEX", a.gex_total > 0 ? "LONG GAMMA (amortiguador)" : "SHORT GAMMA (amplificador)"),
-      filaTabla("GEX total", a.gex_total.toLocaleString("en-US", { maximumFractionDigits: 0 })),
-      filaTabla("Flip point", `$${a.flip_point.toLocaleString("en-US", { maximumFractionDigits: 0 })}`),
-      filaTabla("Call wall", `$${a.muros.call_wall.toLocaleString("en-US", { maximumFractionDigits: 0 })}`),
-      filaTabla("Put wall", `$${a.muros.put_wall.toLocaleString("en-US", { maximumFractionDigits: 0 })}`),
-      filaTabla("DEX neto (BTC)", a.dex.btc_total.toLocaleString("en-US", { maximumFractionDigits: 1 })),
-      filaTabla("Vega neta", a.vega_total.toLocaleString("en-US", { maximumFractionDigits: 1 })),
-      filaTabla("CharmEX total (BTC/día)", a.charm.total.toLocaleString("en-US", { maximumFractionDigits: 1 })),
-      filaTabla("VannaEX total (BTC/punto IV)", a.vanna.total.toLocaleString("en-US", { maximumFractionDigits: 2 })),
-      filaTabla("Ratio Volga/Vega", a.score.ratio_volga_vega.toFixed(2)),
-      filaTabla("Sesgo direccional (score)", `${a.score.sesgo_score > 0 ? "+" : ""}${a.score.sesgo_score.toFixed(0)} / 100`),
+      filaTabla("GEX total", fmtNum(a.gex_total)),
+      filaTabla("Flip point", fmtUsd(a.flip_point)),
+      filaTabla("Call wall", fmtUsd(a.muros.call_wall)),
+      filaTabla("Put wall", fmtUsd(a.muros.put_wall)),
+      filaTabla("DEX neto (BTC)", fmtNum(a.dex.btc_total, 1)),
+      filaTabla("Vega neta", fmtNum(a.vega_total, 1)),
+      filaTabla("CharmEX total (BTC/día)", fmtNum(a.charm.total, 1)),
+      filaTabla("VannaEX total (BTC/punto IV)", fmtNum(a.vanna.total, 2)),
+      filaTabla("Ratio Volga/Vega", a.score.ratio_volga_vega != null ? a.score.ratio_volga_vega.toFixed(2) : "N/D"),
+      filaTabla("Sesgo direccional (score)", a.score.sesgo_score != null ? `${a.score.sesgo_score > 0 ? "+" : ""}${a.score.sesgo_score.toFixed(0)} / 100` : "N/D"),
     ],
   });
 }
@@ -64,6 +74,79 @@ function parrafoBorde() {
     border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: "CCCCCC" } },
     spacing: { after: 200 },
   });
+}
+
+function seccionNoDisponible(motivo) {
+  return new Paragraph({
+    children: [new TextRun({ text: `No disponible en esta corrida (${motivo}).`, italics: true, color: "888888" })],
+    spacing: { after: 150 },
+  });
+}
+
+function seccionSvi(svi) {
+  if (!svi || svi.error || !svi.por_vencimiento || !svi.por_vencimiento.length) {
+    return [seccionNoDisponible(svi?.error || "sin vencimientos ajustables")];
+  }
+  const encabezados = ["Vencimiento", "Días", "Strikes", "IV ATM", "Skew 10% OTM"];
+  const filaEncabezado = new TableRow({
+    children: encabezados.map((h) => new TableCell({
+      shading: { type: ShadingType.CLEAR, fill: "1F2937" },
+      children: [new Paragraph({ children: [new TextRun({ text: h, bold: true, color: "FFFFFF" })] })],
+    })),
+  });
+  const filas = svi.por_vencimiento.map((f) => new TableRow({
+    children: [
+      f.vencimiento?.slice(0, 10) ?? "-",
+      `${f.dias_a_vencimiento?.toFixed(0)}d`,
+      `${f.n_strikes}`,
+      `${f.iv_atm_pct?.toFixed(1)}%`,
+      `${f.skew_10pct_pct >= 0 ? "+" : ""}${f.skew_10pct_pct?.toFixed(2)} pts`,
+    ].map((v) => new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: String(v) })] })] })),
+  }));
+  return [
+    new Table({ width: { size: 9000, type: WidthType.DXA }, rows: [filaEncabezado, ...filas] }),
+    new Paragraph({
+      children: [new TextRun({ text: "Skew positivo = puts más caras que calls (skew \"normal\").", italics: true, color: "555555" })],
+      spacing: { before: 100, after: 150 },
+    }),
+  ];
+}
+
+function seccionVolArbitrage(va) {
+  if (!va || va.error) return [seccionNoDisponible(va?.error || "sin datos")];
+  return [new Paragraph({
+    children: [new TextRun({
+      text: `IV (DVOL): ${va.iv_dvol_pct?.toFixed(1)}%  |  RV realizada: ${va.rv_realizada_pct?.toFixed(1)}%  |  ` +
+            `Spread: ${va.spread >= 0 ? "+" : ""}${va.spread?.toFixed(1)} pts. ${va.lectura ?? ""}`,
+    })],
+    spacing: { after: 150 },
+  })];
+}
+
+function seccionVarianceModelFree(vmf) {
+  if (!vmf || vmf.error) return [seccionNoDisponible(vmf?.error || "sin datos")];
+  const dif = vmf.diferencia != null ? `${vmf.diferencia >= 0 ? "+" : ""}${vmf.diferencia.toFixed(2)} pts (${vmf.diferencia_pct?.toFixed(1)}%)` : "sin comparar";
+  return [new Paragraph({
+    children: [new TextRun({
+      text: `DVOL calculado (model-free): ${vmf.dvol_calculado?.toFixed(2)}  |  DVOL oficial: ${vmf.dvol_oficial?.toFixed(2) ?? "-"}  |  ` +
+            `Diferencia: ${dif}. Método: ${vmf.metodo ?? ""}`,
+    })],
+    spacing: { after: 150 },
+  })];
+}
+
+function seccionOrderFlow(of_) {
+  if (!of_ || of_.error) return [seccionNoDisponible(of_?.error || "sin datos")];
+  const flujoOpc = of_.flujo_opciones
+    ? `Compra: ${of_.flujo_opciones.vol_compra?.toFixed(1)} · Venta: ${of_.flujo_opciones.vol_venta?.toFixed(1)} · Desbalance: ${of_.flujo_opciones.desbalance_pct >= 0 ? "+" : ""}${of_.flujo_opciones.desbalance_pct?.toFixed(1)}%`
+    : "sin datos de opciones acumulados todavía";
+  return [new Paragraph({
+    children: [new TextRun({
+      text: `Kyle Lambda: ${of_.kyle_lambda?.toFixed(5) ?? "-"} (R²=${of_.kyle_r2?.toFixed(2) ?? "-"})  |  VPIN: ${of_.vpin?.toFixed(3) ?? "-"}. ` +
+            `Flujo de opciones: ${flujoOpc}`,
+    })],
+    spacing: { after: 150 },
+  })];
 }
 
 const doc = new Document({
@@ -119,6 +202,19 @@ const doc = new Document({
         }),
 
         new Paragraph({ text: "", spacing: { after: 300 } }),
+
+        new Paragraph({ text: "SVI / Skew por vencimiento", heading: HeadingLevel.HEADING_1, spacing: { before: 200, after: 150 } }),
+        ...seccionSvi(datos.extra?.svi),
+
+        new Paragraph({ text: "Implied vs. Realized Volatility", heading: HeadingLevel.HEADING_1, spacing: { before: 200, after: 150 } }),
+        ...seccionVolArbitrage(datos.extra?.vol_arbitrage),
+
+        new Paragraph({ text: "Varianza model-free vs. DVOL", heading: HeadingLevel.HEADING_1, spacing: { before: 200, after: 150 } }),
+        ...seccionVarianceModelFree(datos.extra?.variance_model_free),
+
+        new Paragraph({ text: "Order Flow: Kyle Lambda / VPIN", heading: HeadingLevel.HEADING_1, spacing: { before: 200, after: 150 } }),
+        ...seccionOrderFlow(datos.extra?.order_flow),
+
         new Paragraph({
           text: "Limitaciones metodológicas",
           heading: HeadingLevel.HEADING_1,

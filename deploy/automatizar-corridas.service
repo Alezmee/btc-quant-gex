@@ -1,0 +1,16 @@
+[Unit]
+Description=Automatizacion de corridas de calcular_gex.py (cada N minutos)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=deribit
+WorkingDirectory=/home/deribit/CRYPTO
+ExecStart=/usr/bin/python3 /home/deribit/CRYPTO/automatizar_corridas.py --intervalo-min 30 --max-instrumentos 100
+Restart=always
+RestartSec=30
+KillSignal=SIGINT
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,39 @@
+name: Forward-test GEX BTC (diario)
+
+on:
+  schedule:
+    # Todos los días a las 09:00 UTC (después de acumular varias corridas del día)
+    - cron: '0 9 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  evaluar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Instalar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Correr evaluar_forward_test.py
+        run: python evaluar_forward_test.py --horizonte-horas 24 --umbral-pct 2.0
+
+      - name: Commitear resultados del forward-test
+        run: |
+          git config user.name "gex-bot"
+          git config user.email "gex-bot@users.noreply.github.com"
+          git add data/forward_test_resultados.csv
+          git diff --cached --quiet && echo "Sin cambios para commitear" && exit 0
+          git commit -m "Forward-test $(date -u +'%Y-%m-%d')"
+          git push

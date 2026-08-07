@@ -206,10 +206,68 @@
   #estado { font-family: var(--font-mono); font-size: 12px; color: var(--text-faint); text-align: center; padding: 40px 0; }
   #estado.error { color: var(--accent-short); }
   #contenido { display: none; }
+
+  /* ---------- Barra de servidor ---------- */
+  .server-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 18px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+  .server-bar-label { color: var(--text-secondary); font-family: var(--font-display); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.05em; }
+  #input-api-base {
+    flex: 1;
+    min-width: 220px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 7px 10px;
+    border-radius: 7px;
+  }
+  .server-bar-hint { color: var(--text-faint); font-size: 11px; }
+
+  /* ---------- Secciones extra (SVI, vol arb, variance, order flow) ---------- */
+  .extra-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-bottom: 16px;
+  }
+  .extra-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+  .extra-header h3 { font-family: var(--font-display); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-secondary); margin: 0; }
+  .btn-cargar { padding: 6px 14px; font-size: 11px; }
+  .extra-body { padding-top: 14px; font-family: var(--font-mono); font-size: 13px; }
+  .extra-placeholder { color: var(--text-faint); }
+  .extra-error { color: var(--accent-short); }
+  .extra-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+  .extra-item { background: var(--surface-2); border-radius: 8px; padding: 12px 14px; }
+  .extra-item .k { color: var(--text-faint); font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; font-family: var(--font-display); margin-bottom: 4px; }
+  .extra-item .v { font-size: 16px; font-weight: 600; }
+  .extra-note { color: var(--text-secondary); margin-top: 10px; font-family: var(--font-body); font-size: 12px; }
+  .extra-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  .extra-table th, .extra-table td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); font-size: 12px; }
+  .extra-table th { color: var(--text-faint); font-weight: 500; text-transform: uppercase; font-size: 10px; letter-spacing: 0.04em; }
 </style>
 </head>
 <body>
 <div class="wrap">
+
+  <div class="server-bar" id="server-bar">
+    <span class="server-bar-label">Backend:</span>
+    <input type="text" id="input-api-base" placeholder="http://tu-servidor:8000">
+    <button id="btn-conectar">Conectar</button>
+    <span class="server-bar-hint">(guardado en la URL de esta página — marcala como favorita)</span>
+  </div>
 
   <header>
     <div>
@@ -254,6 +312,38 @@
       </div>
     </div>
 
+    <div class="extra-section" id="seccion-svi">
+      <div class="extra-header">
+        <h3>SVI / Skew por vencimiento</h3>
+        <button class="btn-cargar" data-endpoint="svi">Cargar</button>
+      </div>
+      <div class="extra-body" id="cuerpo-svi"><span class="extra-placeholder">sin cargar</span></div>
+    </div>
+
+    <div class="extra-section" id="seccion-vol-arb">
+      <div class="extra-header">
+        <h3>Implied vs. Realized Volatility</h3>
+        <button class="btn-cargar" data-endpoint="vol-arbitrage">Cargar</button>
+      </div>
+      <div class="extra-body" id="cuerpo-vol-arb"><span class="extra-placeholder">sin cargar</span></div>
+    </div>
+
+    <div class="extra-section" id="seccion-variance">
+      <div class="extra-header">
+        <h3>Varianza model-free vs. DVOL</h3>
+        <button class="btn-cargar" data-endpoint="variance-model-free">Cargar</button>
+      </div>
+      <div class="extra-body" id="cuerpo-variance"><span class="extra-placeholder">sin cargar</span></div>
+    </div>
+
+    <div class="extra-section" id="seccion-order-flow">
+      <div class="extra-header">
+        <h3>Order Flow: Kyle Lambda / VPIN</h3>
+        <button class="btn-cargar" data-endpoint="order-flow">Cargar</button>
+      </div>
+      <div class="extra-body" id="cuerpo-order-flow"><span class="extra-placeholder">sin cargar</span></div>
+    </div>
+
     <footer>
       Convención: el signo de GEX/DEX asume que los dealers están del lado contrario al open interest
       neto de cada strike (supuesto estándar de la industria, no un dato confirmado). El flip point se
@@ -264,9 +354,10 @@
 </div>
 
 <script>
-const API_BASE = window.location.hostname === "" || window.location.protocol === "file:"
-  ? "http://127.0.0.1:8000"
-  : "";
+const params = new URLSearchParams(window.location.search);
+let API_BASE = params.get("api") || (
+  window.location.protocol === "file:" ? "http://127.0.0.1:8000" : window.location.origin
+);
 document.getElementById("api-base-mostrado").textContent = API_BASE || "(mismo origen)";
 
 const fmt = (n, dec = 0) => Number(n).toLocaleString("en-US", { maximumFractionDigits: dec, minimumFractionDigits: dec });
@@ -459,7 +550,107 @@ document.getElementById("btn-reporte").addEventListener("click", () => {
   window.location.href = `${API_BASE}/api/v1/download-report?max_instrumentos=${maxInstrumentos}`;
 });
 
+// ---------- Barra de servidor: apuntar el dashboard a cualquier backend ----------
+document.getElementById("input-api-base").value = API_BASE;
+document.getElementById("btn-conectar").addEventListener("click", () => {
+  const nuevaBase = document.getElementById("input-api-base").value.trim().replace(/\/$/, "");
+  const url = new URL(window.location.href);
+  url.searchParams.set("api", nuevaBase);
+  window.location.href = url.toString(); // recarga la página con el nuevo backend guardado en la URL
+});
+
+// ---------- Secciones extra: cada una se carga solo al apretar su botón ----------
+const ENDPOINTS_EXTRA = {
+  "svi": { params: () => "max_instrumentos=300", render: renderSvi },
+  "vol-arbitrage": { params: () => "dias_lookback=30&resolucion=60", render: renderVolArbitrage },
+  "variance-model-free": { params: () => "max_instrumentos=200&dias_objetivo=30", render: renderVarianceModelFree },
+  "order-flow": { params: () => "minutos_lookback=120", render: renderOrderFlow },
+};
+
+document.querySelectorAll(".btn-cargar").forEach(btn => {
+  btn.addEventListener("click", async () => {
+    const endpoint = btn.dataset.endpoint;
+    const cuerpoId = "cuerpo-" + (endpoint === "vol-arbitrage" ? "vol-arb" : endpoint === "variance-model-free" ? "variance" : endpoint === "order-flow" ? "order-flow" : endpoint);
+    const cuerpo = document.getElementById(cuerpoId);
+    const { params, render } = ENDPOINTS_EXTRA[endpoint];
+
+    btn.disabled = true;
+    cuerpo.innerHTML = `<span class="extra-placeholder">cargando…</span>`;
+    try {
+      const r = await fetch(`${API_BASE}/api/v1/${endpoint}?${params()}`);
+      if (!r.ok) {
+        const detalle = await r.json().catch(() => ({}));
+        throw new Error(detalle.detail || `Error ${r.status}`);
+      }
+      const data = await r.json();
+      cuerpo.innerHTML = render(data);
+    } catch (e) {
+      cuerpo.innerHTML = `<span class="extra-error">Error: ${e.message}</span>`;
+    } finally {
+      btn.disabled = false;
+    }
+  });
+});
+
+function renderSvi(d) {
+  if (!d.por_vencimiento || !d.por_vencimiento.length) return `<span class="extra-placeholder">sin datos</span>`;
+  const filas = d.por_vencimiento.map(f => `
+    <tr>
+      <td>${f.vencimiento?.slice(0,10) ?? "-"}</td>
+      <td>${fmt(f.dias_a_vencimiento,0)}d</td>
+      <td>${f.n_strikes}</td>
+      <td>${fmt(f.iv_atm_pct,1)}%</td>
+      <td class="${f.skew_10pct_pct >= 0 ? 'pos' : 'neg'}">${f.skew_10pct_pct >= 0 ? '+' : ''}${fmt(f.skew_10pct_pct,2)} pts</td>
+    </tr>
+  `).join("");
+  return `
+    <table class="extra-table">
+      <tr><th>Vencimiento</th><th>Días</th><th>Strikes</th><th>IV ATM</th><th>Skew 10% OTM</th></tr>
+      ${filas}
+    </table>
+    <div class="extra-note">Skew positivo = puts más caras que calls (skew "normal"). Spot: ${fmtUsd(d.spot)}</div>
+  `;
+}
+
+function renderVolArbitrage(d) {
+  return `
+    <div class="extra-grid">
+      <div class="extra-item"><div class="k">IV (DVOL)</div><div class="v">${fmt(d.iv_dvol_pct,1)}%</div></div>
+      <div class="extra-item"><div class="k">RV realizada</div><div class="v">${fmt(d.rv_realizada_pct,1)}%</div></div>
+      <div class="extra-item"><div class="k">Spread</div><div class="v ${d.spread >= 0 ? 'pos' : 'neg'}">${d.spread >= 0 ? '+' : ''}${fmt(d.spread,1)} pts</div></div>
+    </div>
+    <div class="extra-note">${d.lectura ?? ""}</div>
+  `;
+}
+
+function renderVarianceModelFree(d) {
+  const dif = d.diferencia !== undefined && d.diferencia !== null ? `${d.diferencia >= 0 ? '+' : ''}${fmt(d.diferencia,2)} pts (${fmt(d.diferencia_pct,1)}%)` : "sin comparar";
+  return `
+    <div class="extra-grid">
+      <div class="extra-item"><div class="k">DVOL calculado</div><div class="v">${fmt(d.dvol_calculado,2)}</div></div>
+      <div class="extra-item"><div class="k">DVOL oficial</div><div class="v">${d.dvol_oficial != null ? fmt(d.dvol_oficial,2) : "-"}</div></div>
+      <div class="extra-item"><div class="k">Diferencia</div><div class="v">${dif}</div></div>
+    </div>
+    <div class="extra-note">Método: ${d.metodo ?? ""}</div>
+  `;
+}
+
+function renderOrderFlow(d) {
+  const flujoOpc = d.flujo_opciones
+    ? `Compra: ${fmt(d.flujo_opciones.vol_compra,1)} · Venta: ${fmt(d.flujo_opciones.vol_venta,1)} · Desbalance: ${d.flujo_opciones.desbalance_pct >= 0 ? '+' : ''}${fmt(d.flujo_opciones.desbalance_pct,1)}%`
+    : "sin datos de opciones acumulados todavía";
+  return `
+    <div class="extra-grid">
+      <div class="extra-item"><div class="k">Kyle Lambda</div><div class="v">${d.kyle_lambda != null ? fmt(d.kyle_lambda,5) : "-"}</div></div>
+      <div class="extra-item"><div class="k">R²</div><div class="v">${d.kyle_r2 != null ? fmt(d.kyle_r2,2) : "-"}</div></div>
+      <div class="extra-item"><div class="k">VPIN</div><div class="v">${d.vpin != null ? fmt(d.vpin,3) : "-"}</div></div>
+    </div>
+    <div class="extra-note">Flujo de opciones: ${flujoOpc}</div>
+  `;
+}
+
 cargarAnalisis();
 </script>
+
 </body>
 </html>

@@ -93,6 +93,34 @@ def bs_volga(spot, strike, tiempo_anios, iv, r=0.0):
     return vega * d1 * d2 / iv
 
 
+def norm_cdf(x):
+    """CDF de la normal estándar, sin dependencias externas (vía erf)."""
+    return 0.5 * (1 + math.erf(x / math.sqrt(2)))
+
+
+def _bs_d1_d2(spot, strike, tiempo_anios, iv, r=0.0):
+    sqrt_t = math.sqrt(tiempo_anios)
+    d1 = (math.log(spot / strike) + (r + 0.5 * iv**2) * tiempo_anios) / (iv * sqrt_t)
+    d2 = d1 - iv * sqrt_t
+    return d1, d2
+
+
+def bs_call_price(spot, strike, tiempo_anios, iv, r=0.0):
+    """Precio de una call europea (Black-Scholes)."""
+    if tiempo_anios <= 0 or iv <= 0 or spot <= 0 or strike <= 0:
+        return max(spot - strike, 0.0)
+    d1, d2 = _bs_d1_d2(spot, strike, tiempo_anios, iv, r)
+    return spot * norm_cdf(d1) - strike * math.exp(-r * tiempo_anios) * norm_cdf(d2)
+
+
+def bs_put_price(spot, strike, tiempo_anios, iv, r=0.0):
+    """Precio de una put europea (Black-Scholes), vía put-call parity."""
+    if tiempo_anios <= 0 or iv <= 0 or spot <= 0 or strike <= 0:
+        return max(strike - spot, 0.0)
+    call = bs_call_price(spot, strike, tiempo_anios, iv, r)
+    return call - spot + strike * math.exp(-r * tiempo_anios)
+
+
 # ---------- Descarga de datos de mercado ----------
 
 def get_instrumentos_btc_options():

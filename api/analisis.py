@@ -112,3 +112,76 @@ def generar_analisis(max_instrumentos: int = 100, rango_pct: float = 0.15, guard
         "por_strike": _df_a_registros(por_strike),
         "perfil_gex": _df_a_registros(perfil),
     }
+
+
+def generar_svi(max_instrumentos: int = 300, min_strikes: int = 5):
+    """Ajusta SVI por vencimiento y devuelve skew/IV ATM en JSON."""
+    import calcular_svi as svi
+
+    spot, resultados = svi.calcular_svi_todos_vencimientos(max_instrumentos, min_strikes)
+    if resultados.empty:
+        raise ValueError("No se pudo ajustar SVI a ningún vencimiento (pocos strikes por vencimiento)")
+
+    resultados = resultados.copy()
+    for col in resultados.select_dtypes(include=["number"]).columns:
+        resultados[col] = resultados[col].astype(float)
+
+    return {
+        "spot": _num(spot),
+        "por_vencimiento": resultados.to_dict(orient="records"),
+    }
+
+
+def generar_vol_arbitrage(dias_lookback: int = 30, resolucion: str = "60", instrumento: str = "BTC-PERPETUAL"):
+    """IV (DVOL) vs. volatilidad realizada, y el spread entre ambas."""
+    import calcular_vol_arbitrage as va
+
+    r = va.calcular_vol_arbitrage_completo(dias_lookback, resolucion, instrumento, guardar_snapshot=True)
+    return {
+        "iv_dvol_pct": _num(r["iv_dvol_pct"]),
+        "rv_realizada_pct": _num(r["rv_pct"]),
+        "spread": _num(r["spread"]),
+        "spread_relativo_pct": _num(r["spread_pct_relativo"]),
+        "n_velas": r["n_velas"],
+        "dias_lookback": r["dias_lookback"],
+        "lectura": r["lectura"],
+    }
+
+
+def generar_variance_model_free(max_instrumentos: int = 200, dias_objetivo: int = 30):
+    """Varianza model-free (estilo VIX) vs. DVOL oficial."""
+    import calcular_variance_model_free as vmf
+
+    resultado = vmf.calcular_variance_model_free(max_instrumentos, dias_objetivo)
+    dvol_oficial = vmf.obtener_dvol_oficial()
+
+    salida = {
+        "spot": _num(resultado["spot"]),
+        "dvol_calculado": _num(resultado["dvol_calculado"]),
+        "dvol_oficial": _num(dvol_oficial),
+        "metodo": resultado["metodo"],
+    }
+    if dvol_oficial:
+        salida["diferencia"] = _num(resultado["dvol_calculado"] - dvol_oficial)
+        salida["diferencia_pct"] = _num(100 * (resultado["dvol_calculado"] - dvol_oficial) / dvol_oficial)
+    return salida
+
+
+def generar_order_flow(instrumento: str = "BTC-PERPETUAL", minutos_lookback: int = 120,
+                        bucket_segundos: int = 60, vpin_buckets: int = 50):
+    """Kyle Lambda y VPIN sobre el flujo de trades reciente."""
+    import calcular_order_flow as of
+
+    r = of.calcular_order_flow_completo(instrumento, minutos_lookback, bucket_segundos, vpin_buckets)
+    return {
+        "n_trades": r["n_trades"],
+        "kyle_lambda": _num(r["kyle_lambda"]),
+        "kyle_r2": _num(r["kyle_r2"]),
+        "vpin": _num(r["vpin"]),
+        "flujo_opciones": {
+            "vol_compra": _num(r["opciones_vol_compra"]),
+            "vol_venta": _num(r["opciones_vol_venta"]),
+            "desbalance_pct": _num(r["opciones_desbalance_pct"]),
+            "n_trades": r["opciones_n_trades"],
+        } if r["opciones_desbalance_pct"] is not None else None,
+    }

@@ -17,7 +17,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 import requests
 
-from analisis import generar_analisis
+from analisis import (
+    generar_analisis, generar_svi, generar_vol_arbitrage,
+    generar_variance_model_free, generar_order_flow,
+)
 
 DERIBIT_INDEX_URL = "https://www.deribit.com/api/v2/public/get_index_price"
 
@@ -63,6 +66,65 @@ def gex_endpoint(
     """Análisis completo: GEX, muros, DEX, Vega, Charm, Vanna, Volga, flip point y score."""
     try:
         return generar_analisis(max_instrumentos, rango_pct, guardar_snapshot)
+    except ValueError as e:
+        raise HTTPException(status_code=502, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error inesperado: {e}")
+
+
+@app.get("/api/v1/svi")
+def svi_endpoint(
+    max_instrumentos: int = Query(300, ge=1, le=1000),
+    min_strikes: int = Query(5, ge=3, description="Mínimo de strikes distintos por vencimiento para ajustar"),
+):
+    """Ajuste SVI por vencimiento: IV ATM, skew put/call 10% OTM."""
+    try:
+        return generar_svi(max_instrumentos, min_strikes)
+    except ValueError as e:
+        raise HTTPException(status_code=502, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error inesperado: {e}")
+
+
+@app.get("/api/v1/vol-arbitrage")
+def vol_arbitrage_endpoint(
+    dias_lookback: int = Query(30, ge=1, le=365),
+    resolucion: str = Query("60", description="Resolución de velas en minutos, o '1D'"),
+    instrumento: str = Query("BTC-PERPETUAL"),
+):
+    """IV (DVOL) vs. volatilidad realizada del precio."""
+    try:
+        return generar_vol_arbitrage(dias_lookback, resolucion, instrumento)
+    except ValueError as e:
+        raise HTTPException(status_code=502, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error inesperado: {e}")
+
+
+@app.get("/api/v1/variance-model-free")
+def variance_model_free_endpoint(
+    max_instrumentos: int = Query(200, ge=1, le=1000),
+    dias_objetivo: int = Query(30, ge=1, le=365),
+):
+    """Varianza implícita model-free (estilo VIX) vs. DVOL oficial."""
+    try:
+        return generar_variance_model_free(max_instrumentos, dias_objetivo)
+    except ValueError as e:
+        raise HTTPException(status_code=502, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error inesperado: {e}")
+
+
+@app.get("/api/v1/order-flow")
+def order_flow_endpoint(
+    instrumento: str = Query("BTC-PERPETUAL"),
+    minutos_lookback: int = Query(120, ge=1, le=1440),
+    bucket_segundos: int = Query(60, ge=1),
+    vpin_buckets: int = Query(50, ge=5),
+):
+    """Kyle Lambda y VPIN sobre el flujo de trades reciente."""
+    try:
+        return generar_order_flow(instrumento, minutos_lookback, bucket_segundos, vpin_buckets)
     except ValueError as e:
         raise HTTPException(status_code=502, detail=str(e))
     except Exception as e:

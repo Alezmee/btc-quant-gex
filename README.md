@@ -258,22 +258,49 @@ Docs interactivas (Swagger) en `http://127.0.0.1:8000/docs`. Endpoints:
   (mismo contenido que `calcular_gex.py`, pero como respuesta de API en
   vez de imprimirse por consola). Guarda snapshot en el histórico igual
   que la versión de consola.
+- `GET /api/v1/svi?max_instrumentos=300&min_strikes=5` — ajuste SVI y
+  skew por vencimiento (mismo contenido que `calcular_svi.py`)
+- `GET /api/v1/vol-arbitrage?dias_lookback=30&resolucion=60` — IV
+  (DVOL) vs. volatilidad realizada (mismo contenido que
+  `calcular_vol_arbitrage.py`)
+- `GET /api/v1/variance-model-free?max_instrumentos=200&dias_objetivo=30`
+  — varianza model-free vs. DVOL oficial (mismo contenido que
+  `calcular_variance_model_free.py`)
+- `GET /api/v1/order-flow?minutos_lookback=120` — Kyle Lambda, VPIN y
+  flujo de opciones (mismo contenido que `calcular_order_flow.py`)
 - `GET /api/v1/download-report?max_instrumentos=100` — genera y
-  descarga el reporte en Word al vuelo
+  descarga el reporte en Word al vuelo, con las 4 piezas de arriba
+  incluidas como secciones adicionales (cada una falla de forma
+  aislada si no hay datos suficientes, sin romper el resto del reporte)
 
 ### 2. Abrir el dashboard
 
 Con el backend corriendo, abrí `dashboard/index.html` directamente en
 el navegador (doble click, o `file://` en la barra de direcciones — no
-hace falta servirlo, es un archivo HTML autocontenido). Se conecta solo
-a `http://127.0.0.1:8000`.
+hace falta servirlo, es un archivo HTML autocontenido).
+
+Por defecto se conecta a `http://127.0.0.1:8000`. Si el backend corre
+en otro lado (un VPS, por ejemplo — ver `deploy/DEPLOY.md`), abrí el
+dashboard con el backend como parámetro en la URL:
+
+```
+dashboard/index.html?api=https://tu-servidor.com
+```
+
+Así podés dejar el backend corriendo en la nube (sin depender de tu PC)
+y simplemente abrir el HTML —que no necesita servidor propio— apuntando
+ahí. El campo de conexión en la parte superior del dashboard permite
+cambiar esto sin editar la URL a mano.
 
 Muestra: spot, régimen (badge de color), una tira visual con los
 niveles de gamma (put wall, soporte, flip point, spot, resistencia,
 call wall), tarjetas con DEX/Vega/Charm/Vanna/Volga, las 3 barras del
-score de confluencia, y los gráficos de GEX por strike y perfil de GEX.
-Tiene un botón para pedir más/menos instrumentos y otro para descargar
-el reporte Word directamente.
+score de confluencia, los gráficos de GEX por strike y perfil de GEX, y
+4 secciones adicionales (SVI/skew, IV vs RV, varianza model-free, Kyle
+Lambda/VPIN) que se cargan bajo demanda con un botón cada una — no se
+piden automáticamente porque son más lentas y más propensas a fallar
+por falta de datos (por ejemplo, order flow necesita trades recientes).
+Tiene un botón para descargar el reporte Word directamente.
 
 ### 3. Generar el reporte Word sin pasar por el dashboard
 
@@ -293,6 +320,111 @@ Los tres puntos de entrada (`calcular_gex.py` por consola,
 carpeta `data/` en la raíz del proyecto, sin importar desde qué carpeta
 se ejecuten — así que podés usar la consola y la API indistintamente y
 todo se acumula en el mismo histórico.
+
+## Varianza model-free vs. DVOL (validación cruzada)
+
+```bash
+python3 calcular_variance_model_free.py --max-instrumentos 200 --dias-objetivo 30
+```
+
+Calcula un índice de volatilidad "model-free" (misma lógica matemática que
+el VIX: sin asumir Black-Scholes para el resultado final, solo para
+reconstruir precios consistentes a partir de la IV de mercado) usando
+toda la cadena de opciones, y lo compara contra el DVOL oficial que
+publica Deribit.
+
+- Busca los dos vencimientos que "encierran" los `--dias-objetivo` días
+  (uno más corto, uno más largo) e interpola entre ambos, igual que hace
+  la metodología real del VIX.
+- Sirve como **validación**: si nuestro cálculo y el DVOL oficial
+  coinciden razonablemente (dentro de ~5%), es buena señal de que los
+  datos que estamos usando en todo el resto del sistema están limpios.
+- Guarda cada corrida en `data/variance_model_free.csv` para trackear la
+  diferencia en el tiempo.
+
+**Nota de honestidad metodológica:** esta es una versión simplificada de
+la fórmula (integral discreta sobre strikes disponibles), no la fórmula
+exacta que usa CBOE para el VIX real (que filtra por liquidez/bid-ask y
+usa ajustes discretos específicos). Diferencias de unos pocos puntos
+porcentuales contra el DVOL oficial son esperables y no indican
+necesariamente un error.
+
+## Implied vs. Realized Volatility (IV cara/barata)
+
+```bash
+python3 calcular_vol_arbitrage.py --dias-lookback 30 --resolucion 60
+```
+
+Compara la volatilidad implícita (DVOL, lo que el mercado de opciones
+está pagando) contra la volatilidad realizada (lo que el precio de BTC
+efectivamente se movió, calculada con velas de `BTC-PERPETUAL` como
+proxy del spot). El spread entre ambas es la base de las estrategias de
+"volatility arbitrage": la IV suele estar sistemáticamente por encima de
+la RV (la "prima de riesgo de volatilidad"), lo que en promedio favorece
+vender opciones — con el riesgo real de pérdidas grandes en eventos de
+cola. Esto es información descriptiva, no una señal de trading lista
+para ejecutar sin más análisis.
+
+- `--dias-lookback`: ventana de días para calcular la volatilidad realizada.
+- `--resolucion`: granularidad de las velas (minutos, o `1D` para diarias).
+  Con más resolución hay más datos pero también más ruido de microestructura;
+  `60` (velas horarias) suele ser un buen punto medio.
+
+Guarda cada corrida en `data/vol_arbitrage.csv` para trackear el spread
+en el tiempo.
+
+## SVI: superficie de volatilidad y skew real
+
+```bash
+python3 calcular_svi.py --max-instrumentos 300
+```
+
+Ajusta la parametrización SVI (Gatheral) a la IV de mercado real de cada
+vencimiento — en vez de mirar puntos de IV sueltos y ruidosos strike por
+strike, esto da una curva suave de la que se puede leer un **skew real**
+(diferencia de IV entre puts y calls 10% fuera del dinero) y una **IV
+ATM** más confiable.
+
+- `--min-strikes`: mínimo de strikes distintos por vencimiento para
+  intentar el ajuste (default 5; con menos, el ajuste no tiene sentido).
+
+Imprime, por cada vencimiento: IV ATM, IV de put/call 10% OTM, el skew
+en puntos, y si es "normal" (puts más caras, lo típico), "invertido"
+(calls más caras) o "plano". También muestra cómo cambia el skew entre
+el vencimiento más corto y el más largo disponibles (term structure de
+skew). Guarda todo en `data/svi_por_vencimiento.csv`.
+
+**Próximo paso natural (no implementado todavía):** usar esta curva SVI
+suavizada en vez de la IV cruda para recalcular el flip point en
+`calcular_gex.py` — hoy ese cálculo asume IV de mercado fija al simular
+el spot, que es exactamente la limitación que resolvería tener una
+superficie ajustada.
+
+## Kyle Lambda / VPIN: microestructura del flujo de trades
+
+```bash
+python3 calcular_order_flow.py --minutos-lookback 120
+```
+
+A diferencia de todo lo anterior (que usa open interest, una "foto" del
+posicionamiento), esto usa el **flujo de trades real** ejecutándose en
+`BTC-PERPETUAL` — una fuente de información distinta y complementaria.
+
+- **Kyle Lambda**: cuántos puntos de precio se mueve el mercado por cada
+  unidad de volumen neto (compras - ventas) ejecutado. Lambda alto =
+  mercado poco líquido / mucho impacto por orden. Sensible al tamaño de
+  bucket (`--bucket-segundos`) y al ruido de precio — con buckets muy
+  chicos el ruido puede dominar la señal y dar un R² bajo.
+- **VPIN**: proporción del volumen desbalanceado entre compras y ventas,
+  en ventanas de volumen fijo (no de tiempo). Valores altos sugieren
+  mayor probabilidad de flujo dominado por información.
+- **Flujo de opciones (complemento)**: si ya tenés trades de opciones
+  acumulados (`data/trades_opciones_btc.parquet`, vía `backfill_historico.py`
+  o `colector_en_vivo.py`), también calcula el desbalance compra/venta
+  de ESE flujo — una segunda fuente de presión direccional, distinta del
+  DEX (que sale del open interest, no del flujo).
+
+Guarda cada corrida en `data/order_flow.csv`.
 
 ## Siguientes pasos posibles
 

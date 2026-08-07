@@ -74,15 +74,20 @@ def _narrativa(analisis):
     sesgo_txt = "alcista" if sesgo > 0 else "bajista" if sesgo < 0 else "neutral"
     alineado_txt = "confirmado por DEX y Vanna" if analisis["score"]["sesgo_alineado"] else "sin confirmación de Vanna (más débil)"
 
+    flip_txt = f"{analisis['flip_point']:,.0f} USD" if analisis.get("flip_point") is not None else "no identificado dentro del rango simulado"
+
+    def _fmt_nivel(valor):
+        return f"{valor:,.0f}" if valor is not None else "no disponible en esta muestra"
+
     parrafos = [
         f"Con el spot de BTC en {analisis['spot']:,.0f} USD, el régimen de gamma actual es "
-        f"{regimen_txt}. El flip point estimado está en {analisis['flip_point']:,.0f} USD.",
+        f"{regimen_txt}. El flip point estimado está en {flip_txt}.",
 
         f"El call wall (mayor concentración de gamma del lado calls) se ubica en "
-        f"{analisis['muros']['call_wall']:,.0f}, mientras que el put wall está en "
-        f"{analisis['muros']['put_wall']:,.0f}. La resistencia más cercana al spot es "
-        f"{analisis['muros']['resistencia_cercana']:,.0f} y el soporte más cercano es "
-        f"{analisis['muros']['soporte_cercano']:,.0f}.",
+        f"{_fmt_nivel(analisis['muros']['call_wall'])}, mientras que el put wall está en "
+        f"{_fmt_nivel(analisis['muros']['put_wall'])}. La resistencia más cercana al spot es "
+        f"{_fmt_nivel(analisis['muros']['resistencia_cercana'])} y el soporte más cercano es "
+        f"{_fmt_nivel(analisis['muros']['soporte_cercano'])}.",
 
         f"El sesgo direccional del score es {sesgo_txt} ({sesgo:+.0f} en una escala de -100 a +100), "
         f"{alineado_txt}.",
@@ -99,7 +104,21 @@ def _narrativa(analisis):
     return parrafos
 
 
-def preparar_reporte(max_instrumentos=100, rango_pct=0.15):
+def _seccion_opcional(fn, **kwargs):
+    """
+    Corre una de las 4 piezas nuevas (SVI, vol arbitrage, variance
+    model-free, order flow) y devuelve su resultado, o None si falla —
+    ninguna de estas debería tirar abajo la generación del resto del
+    reporte (por ejemplo, order flow puede fallar si no hay trades en
+    la ventana, o si no hay datos de opciones acumulados todavía).
+    """
+    try:
+        return fn(**kwargs)
+    except Exception as e:
+        return {"error": str(e)}
+
+
+def preparar_reporte(max_instrumentos=100, rango_pct=0.15, incluir_extra=True):
     analisis = generar_analisis(max_instrumentos=max_instrumentos, rango_pct=rango_pct, guardar_snapshot=True)
 
     grafico_strike_path = GRAFICOS_DIR / "gex_por_strike.png"
@@ -108,12 +127,21 @@ def preparar_reporte(max_instrumentos=100, rango_pct=0.15):
     _grafico_gex_por_strike(analisis["por_strike"], analisis["spot"], analisis["flip_point"], grafico_strike_path)
     _grafico_perfil_gex(analisis["perfil_gex"], analisis["spot"], analisis["flip_point"], grafico_perfil_path)
 
+    extra = {}
+    if incluir_extra:
+        from analisis import generar_svi, generar_vol_arbitrage, generar_variance_model_free, generar_order_flow
+        extra["svi"] = _seccion_opcional(generar_svi, max_instrumentos=min(max_instrumentos, 300))
+        extra["vol_arbitrage"] = _seccion_opcional(generar_vol_arbitrage)
+        extra["variance_model_free"] = _seccion_opcional(generar_variance_model_free)
+        extra["order_flow"] = _seccion_opcional(generar_order_flow)
+
     datos_reporte = {
         "analisis": analisis,
         "narrativa": _narrativa(analisis),
         "grafico_strike": str(grafico_strike_path),
         "grafico_perfil": str(grafico_perfil_path),
         "generado_en": __import__("datetime").datetime.now().strftime("%Y-%m-%d %H:%M UTC"),
+        "extra": extra,
     }
 
     out_json = Path(__file__).resolve().parent / "datos_reporte.json"

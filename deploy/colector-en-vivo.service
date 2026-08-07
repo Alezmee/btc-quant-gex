@@ -1,0 +1,17 @@
+[Unit]
+Description=Colector en vivo de opciones BTC (Deribit WebSocket)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=deribit
+WorkingDirectory=/home/deribit/CRYPTO
+ExecStart=/usr/bin/python3 /home/deribit/CRYPTO/colector_en_vivo.py
+Restart=always
+RestartSec=15
+# Reinicia solo si se cae; si lo cortás vos con systemctl stop, no reinicia.
+KillSignal=SIGINT
+
+[Install]
+WantedBy=multi-user.target

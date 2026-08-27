@@ -285,65 +285,81 @@ timestamp_señal,spot_inicial,spot_futuro,cambio_pct,tipo_regimen,confianza_regi
 2026-08-25 04:26:44.989968+00:00,80267.47,79044.91,-1.5231076798608423,RANGO / REVERSIÓN (long gamma),48.96449704142012,70.1923076923077,rango_sostenido,rango_sostenido,True,historico
 2026-08-25 06:23:33.803863+00:00,80800.82,78852.97,-2.410680980712826,RANGO / REVERSIÓN (long gamma),55.32544378698225,70.85798816568047,rango_sostenido,ruptura_bajista,False,historico
 2026-08-25 08:27:22.085760+00:00,80199.51,78991.01,-1.5068670619059894,RANGO / REVERSIÓN (long gamma),32.02662721893491,63.53550295857988,rango_sostenido,rango_sostenido,True,historico
-,64831.84,78515.08,21.105740636082526,RANGO / REVERSION (long gamma),75.0,75.0,rango_sostenido,ruptura_alcista,False,precio_actual_api
-,65112.69,78515.08,20.583376297308558,RANGO / REVERSION (long gamma),75.0,15.0,rango_sostenido,ruptura_alcista,False,precio_actual_api
-,64330.18,78515.08,22.05014815752109,RANGO / REVERSION (long gamma),65.0,50.0,rango_sostenido,ruptura_alcista,False,precio_actual_api
-,63910.32,78515.08,22.851958807278702,TENDENCIA / EXPANSION (short gamma),25.0,-0.0,ruptura_bajista,ruptura_alcista,False,precio_actual_api
-,63770.18,78515.08,23.121935675891148,TENDENCIA / EXPANSION (short gamma),31.25,-1.875,ruptura_bajista,ruptura_alcista,False,precio_actual_api
-,63760.21,78515.08,23.14118789759319,TENDENCIA / EXPANSION (short gamma),31.25,-1.875,ruptura_bajista,ruptura_alcista,False,precio_actual_api
-,62659.99,78515.08,25.303371417710096,TENDENCIA / EXPANSION (short gamma),43.75,-1.875,ruptura_bajista,ruptura_alcista,False,precio_actual_api
-,62817.55,78515.08,24.989083464732385,TENDENCIA / EXPANSION (short gamma),43.75,-1.875,ruptura_bajista,ruptura_alcista,False,precio_actual_api
-,63046.2,78515.08,24.535784868873943,TENDENCIA / EXPANSION (short gamma),43.75,-1.875,ruptura_bajista,ruptura_alcista,False,precio_actual_api
-,62913.48,78515.08,24.798501052556617,TENDENCIA / EXPANSION (short gamma),43.75,-1.875,ruptura_bajista,ruptura_alcista,False,precio_actual_api
-,62907.99,78515.08,24.809392256850053,TENDENCIA / EXPANSION (short gamma),56.25,-1.875,ruptura_bajista,ruptura_alcista,False,precio_actual_api
-,62870.7,78515.08,24.88341946248412,TENDENCIA / EXPANSION (short gamma),56.25,-1.875,ruptura_bajista,ruptura_alcista,False,precio_actual_api
-,63058.56,78515.08,24.511374823655988,TENDENCIA / EXPANSION (short gamma),43.75,-1.875,ruptura_bajista,ruptura_alcista,False,precio_actual_api
-,63008.71,78515.08,24.60988330026119,TENDENCIA / EXPANSION (short gamma),75.0,-1.875,ruptura_bajista,ruptura_alcista,False,precio_actual_api
-,62997.36,78515.08,24.63233379938461,TENDENCIA / EXPANSION (short gamma),31.25,-1.875,ruptura_bajista,ruptura_alcista,False,precio_actual_api
-,63002.56,78515.08,24.62204710411768,TENDENCIA / EXPANSION (short gamma),30.26315789473684,-3.1578947368421053,ruptura_bajista,ruptura_alcista,False,precio_actual_api
-,63054.45,78515.08,24.51949069415403,TENDENCIA / EXPANSION (short gamma),27.63157894736842,-2.3684210526315788,ruptura_bajista,ruptura_alcista,False,precio_actual_api
-,63056.14,78515.08,24.516153383318425,TENDENCIA / EXPANSION (short gamma),25.0,-1.5789473684210529,ruptura_bajista,ruptura_alcista,False,precio_actual_api
-,62924.55,78515.08,24.776545879152092,TENDENCIA / EXPANSION (short gamma),35.526315789473685,-3.947368421052632,ruptura_bajista,ruptura_alcista,False,precio_actual_api
-,62373.18,78515.08,25.879552718011173,TENDENCIA / EXPANSION (short gamma),46.05263157894737,-8.68421052631579,ruptura_bajista,ruptura_alcista,False,precio_actual_api
-,62522.05,78515.08,25.579823438290965,TENDENCIA / EXPANSION (short gamma),35.526315789473685,-6.315789473684211,ruptura_bajista,ruptura_alcista,False,precio_actual_api
-,62801.28,78515.08,25.021464530659255,TENDENCIA / EXPANSION (short gamma),35.526315789473685,-3.947368421052632,ruptura_bajista,ruptura_alcista,False,precio_actual_api
-,62922.31,78515.08,24.78098785629454,TENDENCIA / EXPANSION (short gamma),25.0,-3.1578947368421053,ruptura_bajista,ruptura_alcista,False,precio_actual_api
-,63407.67,78515.08,23.825839996959363,RANGO / REVERSION (long gamma),35.526315789473685,56.578947368421055,rango_sostenido,ruptura_alcista,False,precio_actual_api
-,63438.65,78515.08,23.765370164718195,RANGO / REVERSION (long gamma),25.0,50.0,rango_sostenido,ruptura_alcista,False,precio_actual_api
-,63103.79,78515.08,24.422130588352935,TENDENCIA / EXPANSION (short gamma),26.724137931034484,-1.0344827586206895,ruptura_bajista,ruptura_alcista,False,precio_actual_api
-,63074.3,78515.08,24.48030338822626,TENDENCIA / EXPANSION (short gamma),26.724137931034484,-3.103448275862069,ruptura_bajista,ruptura_alcista,False,precio_actual_api
-,63036.94,78515.08,24.55407892578542,TENDENCIA / EXPANSION (short gamma),26.724137931034484,-3.103448275862069,ruptura_bajista,ruptura_alcista,False,precio_actual_api
-,63164.71,78515.08,24.302130097644717,TENDENCIA / EXPANSION (short gamma),26.724137931034484,-1.0344827586206895,ruptura_bajista,ruptura_alcista,False,precio_actual_api
-,63342.17,78515.08,23.953884118589567,TENDENCIA / EXPANSION (short gamma),25.0,-0.5172413793103449,ruptura_bajista,ruptura_alcista,False,precio_actual_api
-,63350.43,78515.08,23.937722285389384,TENDENCIA / EXPANSION (short gamma),25.0,-0.5172413793103449,ruptura_bajista,ruptura_alcista,False,precio_actual_api
-,63346.8,78515.08,23.944824363661617,TENDENCIA / EXPANSION (short gamma),25.0,-0.5172413793103449,ruptura_bajista,ruptura_alcista,False,precio_actual_api
-,63057.41,78515.08,24.51364558106652,TENDENCIA / EXPANSION (short gamma),33.62068965517241,-4.137931034482759,ruptura_bajista,ruptura_alcista,False,precio_actual_api
-,62773.21,78515.08,25.077369788800034,TENDENCIA / EXPANSION (short gamma),43.96551724137931,-7.241379310344827,ruptura_bajista,ruptura_alcista,False,precio_actual_api
-,62441.64,78515.08,25.741540420783316,TENDENCIA / EXPANSION (short gamma),40.51724137931035,-5.689655172413793,ruptura_bajista,ruptura_alcista,False,precio_actual_api
-,62669.49,78515.08,25.284376815576454,TENDENCIA / EXPANSION (short gamma),44.23076923076923,-6.153846153846153,ruptura_bajista,ruptura_alcista,False,precio_actual_api
-,63710.54,78515.08,23.237191208864346,RANGO / REVERSION (long gamma),37.82051282051282,61.53846153846154,rango_sostenido,ruptura_alcista,False,precio_actual_api
-,63853.35,78515.08,22.961567404059462,RANGO / REVERSION (long gamma),48.07692307692308,64.1025641025641,rango_sostenido,ruptura_alcista,False,precio_actual_api
-,63733.46,78515.08,23.192872315421134,RANGO / REVERSION (long gamma),42.94871794871795,61.53846153846154,rango_sostenido,ruptura_alcista,False,precio_actual_api
-,63532.84,78515.08,23.581883007276247,RANGO / REVERSION (long gamma),32.69230769230769,57.69230769230769,rango_sostenido,ruptura_alcista,False,precio_actual_api
-,63361.54,78515.08,23.915990678256875,RANGO / REVERSION (long gamma),26.28205128205128,53.20512820512821,rango_sostenido,ruptura_alcista,False,precio_actual_api
-,64060.74,78515.08,22.563492085792333,RANGO / REVERSION (long gamma),53.20512820512821,66.02564102564102,rango_sostenido,ruptura_alcista,False,precio_actual_api
-,63583.32,78515.08,23.483769013634397,TENDENCIA / EXPANSION (short gamma),48.07692307692308,-2.6923076923076925,ruptura_bajista,ruptura_alcista,False,precio_actual_api
-,63878.56,78515.08,22.91303999338746,TENDENCIA / EXPANSION (short gamma),35.638297872340424,53.191489361702125,ruptura_alcista,ruptura_alcista,True,precio_actual_api
-,64024.59,78515.08,22.63269471932582,TENDENCIA / EXPANSION (short gamma),27.127659574468083,60.63829787234042,ruptura_alcista,ruptura_alcista,True,precio_actual_api
-,64000.38,78515.08,22.679084092938208,TENDENCIA / EXPANSION (short gamma),25.0,61.70212765957447,ruptura_alcista,ruptura_alcista,True,precio_actual_api
-,64261.44,78515.08,22.18070432284119,RANGO / REVERSION (long gamma),49.46808510638298,67.5531914893617,rango_sostenido,ruptura_alcista,False,precio_actual_api
-,64280.87,78515.08,22.143773100768545,RANGO / REVERSION (long gamma),51.59574468085106,67.5531914893617,rango_sostenido,ruptura_alcista,False,precio_actual_api
-,64138.65,78515.08,22.414612717916576,RANGO / REVERSION (long gamma),40.95744680851064,66.48936170212767,rango_sostenido,ruptura_alcista,False,precio_actual_api
-,63972.9,78515.08,22.731781738830037,RANGO / REVERSION (long gamma),27.127659574468083,65.95744680851064,rango_sostenido,ruptura_alcista,False,precio_actual_api
-,64063.46,78515.08,22.55828829726025,RANGO / REVERSION (long gamma),25.0,65.42553191489361,rango_sostenido,ruptura_alcista,False,precio_actual_api
-,64201.49,78515.08,22.294794092785082,RANGO / REVERSION (long gamma),56.91489361702128,71.80851063829788,rango_sostenido,ruptura_alcista,False,precio_actual_api
-,64046.58,78515.08,22.590589536552926,RANGO / REVERSION (long gamma),56.25,70.98214285714286,rango_sostenido,ruptura_alcista,False,precio_actual_api
-,64068.8,78515.08,22.54807332117973,RANGO / REVERSION (long gamma),56.25,70.98214285714286,rango_sostenido,ruptura_alcista,False,precio_actual_api
-,64416.39,78515.08,21.886805516422143,RANGO / REVERSION (long gamma),67.85714285714286,72.32142857142857,rango_sostenido,ruptura_alcista,False,precio_actual_api
-,64516.52,78515.08,21.69763651232274,RANGO / REVERSION (long gamma),71.42857142857143,72.32142857142857,rango_sostenido,ruptura_alcista,False,precio_actual_api
-,64843.36,78515.08,21.084225123435925,RANGO / REVERSION (long gamma),71.42857142857143,74.55357142857143,rango_sostenido,ruptura_alcista,False,precio_actual_api
-,64848.74,78515.08,21.074179698788296,RANGO / REVERSION (long gamma),71.42857142857143,74.55357142857143,rango_sostenido,ruptura_alcista,False,precio_actual_api
-,64644.81,78515.08,21.45612308242534,RANGO / REVERSION (long gamma),71.42857142857143,72.32142857142857,rango_sostenido,ruptura_alcista,False,precio_actual_api
-,64522.7,78515.08,21.685980282908194,RANGO / REVERSION (long gamma),71.42857142857143,72.32142857142857,rango_sostenido,ruptura_alcista,False,precio_actual_api
-,64599.08,78515.08,21.542102457186697,RANGO / REVERSION (long gamma),71.42857142857143,72.32142857142857,rango_sostenido,ruptura_alcista,False,precio_actual_api
-,64725.76,78515.08,21.30422261553978,RANGO / REVERSION (long gamma),71.42857142857143,72.32142857142857,rango_sostenido,ruptura_alcista,False,precio_actual_api
+2026-08-25 10:19:37.644512+00:00,79382.64,78539.96,-1.0615419189888282,RANGO / REVERSIÓN (long gamma),31.42857142857143,58.07142857142857,rango_sostenido,rango_sostenido,True,historico
+2026-08-25 12:22:05.585307+00:00,78881.36,78542.47,-0.42961987470804186,RANGO / REVERSIÓN (long gamma),31.642857142857142,52.85714285714285,rango_sostenido,rango_sostenido,True,historico
+2026-08-25 14:32:56.283517+00:00,79306.9,77979.44,-1.6738266153386299,RANGO / REVERSIÓN (long gamma),40.07142857142857,60.14285714285714,rango_sostenido,rango_sostenido,True,historico
+2026-08-25 16:22:18.713550+00:00,79156.01,77979.44,-1.4863937684580015,RANGO / REVERSIÓN (long gamma),40.71428571428572,58.71428571428572,rango_sostenido,rango_sostenido,True,historico
+2026-08-25 18:20:54.385364+00:00,79245.63,78525.09,-0.9092488759317178,RANGO / REVERSIÓN (long gamma),42.642857142857146,59.92857142857143,rango_sostenido,rango_sostenido,True,historico
+2026-08-25 20:15:11.436850+00:00,78845.99,78694.68,-0.1919057646432142,TENDENCIA / EXPANSIÓN (short gamma),41.71428571428571,53.07142857142857,ruptura_alcista,rango_sostenido,False,historico
+2026-08-25 22:13:36.672969+00:00,78915.03,78694.68,-0.27922437588885896,RANGO / REVERSIÓN (long gamma),43.21428571428572,54.14285714285714,rango_sostenido,rango_sostenido,True,historico
+2026-08-26 00:33:06.766379+00:00,78579.34,78650.84,0.09099083804979782,TENDENCIA / EXPANSIÓN (short gamma),47.57142857142858,50.57142857142857,ruptura_alcista,rango_sostenido,False,historico
+2026-08-26 02:55:09.127867+00:00,79063.98,78650.84,-0.5225388350042578,RANGO / REVERSIÓN (long gamma),52.21428571428572,57.785714285714285,rango_sostenido,rango_sostenido,True,historico
+2026-08-26 04:28:08.693372+00:00,79044.91,78650.84,-0.4985393746415891,RANGO / REVERSIÓN (long gamma),54.92857142857143,58.285714285714285,rango_sostenido,rango_sostenido,True,historico
+2026-08-26 06:25:35.226376+00:00,78852.97,80428.37,1.997895577046742,RANGO / REVERSIÓN (long gamma),53.78571428571429,54.14285714285714,rango_sostenido,rango_sostenido,True,historico
+2026-08-26 08:28:30.939746+00:00,78991.01,80428.37,1.819650109550442,RANGO / REVERSIÓN (long gamma),35.92857142857143,73.57142857142857,rango_sostenido,rango_sostenido,True,historico
+2026-08-26 10:22:44.047763+00:00,78539.96,80428.37,2.4043938907022473,RANGO / REVERSIÓN (long gamma),37.15469613259668,73.54972375690608,rango_sostenido,ruptura_alcista,False,historico
+2026-08-26 12:24:04.893981+00:00,78542.47,80428.37,2.4011213296449605,RANGO / REVERSIÓN (long gamma),36.947513812154696,73.54972375690608,rango_sostenido,ruptura_alcista,False,historico
+2026-08-26 14:32:41.493261+00:00,78272.05,80428.37,2.754904209101451,RANGO / REVERSIÓN (long gamma),40.60773480662984,73.54972375690608,rango_sostenido,ruptura_alcista,False,historico
+2026-08-26 16:40:17.302915+00:00,77979.44,80428.37,3.140481644905366,TENDENCIA / EXPANSIÓN (short gamma),37.84530386740332,73.54972375690608,ruptura_alcista,ruptura_alcista,True,historico
+,64831.84,80212.9,23.724546457419684,RANGO / REVERSION (long gamma),75.0,75.0,rango_sostenido,ruptura_alcista,False,precio_actual_api
+,65112.69,80212.9,23.190886446251863,RANGO / REVERSION (long gamma),75.0,15.0,rango_sostenido,ruptura_alcista,False,precio_actual_api
+,64330.18,80212.9,24.68937596630383,RANGO / REVERSION (long gamma),65.0,50.0,rango_sostenido,ruptura_alcista,False,precio_actual_api
+,63910.32,80212.9,25.50852507075539,TENDENCIA / EXPANSION (short gamma),25.0,-0.0,ruptura_bajista,ruptura_alcista,False,precio_actual_api
+,63770.18,80212.9,25.784339953250868,TENDENCIA / EXPANSION (short gamma),31.25,-1.875,ruptura_bajista,ruptura_alcista,False,precio_actual_api
+,63760.21,80212.9,25.804008487424984,TENDENCIA / EXPANSION (short gamma),31.25,-1.875,ruptura_bajista,ruptura_alcista,False,precio_actual_api
+,62659.99,80212.9,28.012947336889134,TENDENCIA / EXPANSION (short gamma),43.75,-1.875,ruptura_bajista,ruptura_alcista,False,precio_actual_api
+,62817.55,80212.9,27.691863181547177,TENDENCIA / EXPANSION (short gamma),43.75,-1.875,ruptura_bajista,ruptura_alcista,False,precio_actual_api
+,63046.2,80212.9,27.22876239963709,TENDENCIA / EXPANSION (short gamma),43.75,-1.875,ruptura_bajista,ruptura_alcista,False,precio_actual_api
+,62913.48,80212.9,27.497159591235437,TENDENCIA / EXPANSION (short gamma),43.75,-1.875,ruptura_bajista,ruptura_alcista,False,precio_actual_api
+,62907.99,80212.9,27.508286308305184,TENDENCIA / EXPANSION (short gamma),56.25,-1.875,ruptura_bajista,ruptura_alcista,False,precio_actual_api
+,62870.7,80212.9,27.583914287577514,TENDENCIA / EXPANSION (short gamma),56.25,-1.875,ruptura_bajista,ruptura_alcista,False,precio_actual_api
+,63058.56,80212.9,27.20382450852033,TENDENCIA / EXPANSION (short gamma),43.75,-1.875,ruptura_bajista,ruptura_alcista,False,precio_actual_api
+,63008.71,80212.9,27.304463144857266,TENDENCIA / EXPANSION (short gamma),75.0,-1.875,ruptura_bajista,ruptura_alcista,False,precio_actual_api
+,62997.36,80212.9,27.32739911640741,TENDENCIA / EXPANSION (short gamma),31.25,-1.875,ruptura_bajista,ruptura_alcista,False,precio_actual_api
+,63002.56,80212.9,27.31688998034365,TENDENCIA / EXPANSION (short gamma),30.26315789473684,-3.1578947368421053,ruptura_bajista,ruptura_alcista,False,precio_actual_api
+,63054.45,80212.9,27.212115877626395,TENDENCIA / EXPANSION (short gamma),27.63157894736842,-2.3684210526315788,ruptura_bajista,ruptura_alcista,False,precio_actual_api
+,63056.14,80212.9,27.20870640036005,TENDENCIA / EXPANSION (short gamma),25.0,-1.5789473684210529,ruptura_bajista,ruptura_alcista,False,precio_actual_api
+,62924.55,80212.9,27.474729656390057,TENDENCIA / EXPANSION (short gamma),35.526315789473685,-3.947368421052632,ruptura_bajista,ruptura_alcista,False,precio_actual_api
+,62373.18,80212.9,28.60158805435284,TENDENCIA / EXPANSION (short gamma),46.05263157894737,-8.68421052631579,ruptura_bajista,ruptura_alcista,False,precio_actual_api
+,62522.05,80212.9,28.29537739085649,TENDENCIA / EXPANSION (short gamma),35.526315789473685,-6.315789473684211,ruptura_bajista,ruptura_alcista,False,precio_actual_api
+,62801.28,80212.9,27.72494445973075,TENDENCIA / EXPANSION (short gamma),35.526315789473685,-3.947368421052632,ruptura_bajista,ruptura_alcista,False,precio_actual_api
+,62922.31,80212.9,27.479267687406896,TENDENCIA / EXPANSION (short gamma),25.0,-3.1578947368421053,ruptura_bajista,ruptura_alcista,False,precio_actual_api
+,63407.67,80212.9,26.503465590203827,RANGO / REVERSION (long gamma),35.526315789473685,56.578947368421055,rango_sostenido,ruptura_alcista,False,precio_actual_api
+,63438.65,80212.9,26.44168815067785,RANGO / REVERSION (long gamma),25.0,50.0,rango_sostenido,ruptura_alcista,False,precio_actual_api
+,63103.79,80212.9,27.112650444608782,TENDENCIA / EXPANSION (short gamma),26.724137931034484,-1.0344827586206895,ruptura_bajista,ruptura_alcista,False,precio_actual_api
+,63074.3,80212.9,27.172081180449076,TENDENCIA / EXPANSION (short gamma),26.724137931034484,-3.103448275862069,ruptura_bajista,ruptura_alcista,False,precio_actual_api
+,63036.94,80212.9,27.24745204954427,TENDENCIA / EXPANSION (short gamma),26.724137931034484,-3.103448275862069,ruptura_bajista,ruptura_alcista,False,precio_actual_api
+,63164.71,80212.9,26.990055048143173,TENDENCIA / EXPANSION (short gamma),26.724137931034484,-1.0344827586206895,ruptura_bajista,ruptura_alcista,False,precio_actual_api
+,63342.17,80212.9,26.634278554081735,TENDENCIA / EXPANSION (short gamma),25.0,-0.5172413793103449,ruptura_bajista,ruptura_alcista,False,precio_actual_api
+,63350.43,80212.9,26.617767235360507,TENDENCIA / EXPANSION (short gamma),25.0,-0.5172413793103449,ruptura_bajista,ruptura_alcista,False,precio_actual_api
+,63346.8,80212.9,26.62502288986972,TENDENCIA / EXPANSION (short gamma),25.0,-0.5172413793103449,ruptura_bajista,ruptura_alcista,False,precio_actual_api
+,63057.41,80212.9,27.20614436907572,TENDENCIA / EXPANSION (short gamma),33.62068965517241,-4.137931034482759,ruptura_bajista,ruptura_alcista,False,precio_actual_api
+,62773.21,80212.9,27.782058620229865,TENDENCIA / EXPANSION (short gamma),43.96551724137931,-7.241379310344827,ruptura_bajista,ruptura_alcista,False,precio_actual_api
+,62441.64,80212.9,28.460591361789977,TENDENCIA / EXPANSION (short gamma),40.51724137931035,-5.689655172413793,ruptura_bajista,ruptura_alcista,False,precio_actual_api
+,62669.49,80212.9,27.99354199308148,TENDENCIA / EXPANSION (short gamma),44.23076923076923,-6.153846153846153,ruptura_bajista,ruptura_alcista,False,precio_actual_api
+,63710.54,80212.9,25.902087786416487,RANGO / REVERSION (long gamma),37.82051282051282,61.53846153846154,rango_sostenido,ruptura_alcista,False,precio_actual_api
+,63853.35,80212.9,25.620503857667604,RANGO / REVERSION (long gamma),48.07692307692308,64.1025641025641,rango_sostenido,ruptura_alcista,False,precio_actual_api
+,63733.46,80212.9,25.856810535627588,RANGO / REVERSION (long gamma),42.94871794871795,61.53846153846154,rango_sostenido,ruptura_alcista,False,precio_actual_api
+,63532.84,80212.9,26.254233243783844,RANGO / REVERSION (long gamma),32.69230769230769,57.69230769230769,rango_sostenido,ruptura_alcista,False,precio_actual_api
+,63361.54,80212.9,26.595565701212426,RANGO / REVERSION (long gamma),26.28205128205128,53.20512820512821,rango_sostenido,ruptura_alcista,False,precio_actual_api
+,64060.74,80212.9,25.213820508473674,RANGO / REVERSION (long gamma),53.20512820512821,66.02564102564102,rango_sostenido,ruptura_alcista,False,precio_actual_api
+,63583.32,80212.9,26.15399762075965,TENDENCIA / EXPANSION (short gamma),48.07692307692308,-2.6923076923076925,ruptura_bajista,ruptura_alcista,False,precio_actual_api
+,63878.56,80212.9,25.570927084142152,TENDENCIA / EXPANSION (short gamma),35.638297872340424,53.191489361702125,ruptura_alcista,ruptura_alcista,True,precio_actual_api
+,64024.59,80212.9,25.284519588489356,TENDENCIA / EXPANSION (short gamma),27.127659574468083,60.63829787234042,ruptura_alcista,ruptura_alcista,True,precio_actual_api
+,64000.38,80212.9,25.33191209177195,TENDENCIA / EXPANSION (short gamma),25.0,61.70212765957447,ruptura_alcista,ruptura_alcista,True,precio_actual_api
+,64261.44,80212.9,24.82275529462146,RANGO / REVERSION (long gamma),49.46808510638298,67.5531914893617,rango_sostenido,ruptura_alcista,False,precio_actual_api
+,64280.87,80212.9,24.785025467141296,RANGO / REVERSION (long gamma),51.59574468085106,67.5531914893617,rango_sostenido,ruptura_alcista,False,precio_actual_api
+,64138.65,80212.9,25.06172175435559,RANGO / REVERSION (long gamma),40.95744680851064,66.48936170212767,rango_sostenido,ruptura_alcista,False,precio_actual_api
+,63972.9,80212.9,25.38574927820998,RANGO / REVERSION (long gamma),27.127659574468083,65.95744680851064,rango_sostenido,ruptura_alcista,False,precio_actual_api
+,64063.46,80212.9,25.208504192561556,RANGO / REVERSION (long gamma),25.0,65.42553191489361,rango_sostenido,ruptura_alcista,False,precio_actual_api
+,64201.49,80212.9,24.93931215615089,RANGO / REVERSION (long gamma),56.91489361702128,71.80851063829788,rango_sostenido,ruptura_alcista,False,precio_actual_api
+,64046.58,80212.9,25.24150391792972,RANGO / REVERSION (long gamma),56.25,70.98214285714286,rango_sostenido,ruptura_alcista,False,precio_actual_api
+,64068.8,80212.9,25.198068326548945,RANGO / REVERSION (long gamma),56.25,70.98214285714286,rango_sostenido,ruptura_alcista,False,precio_actual_api
+,64416.39,80212.9,24.522501183316848,RANGO / REVERSION (long gamma),67.85714285714286,72.32142857142857,rango_sostenido,ruptura_alcista,False,precio_actual_api
+,64516.52,80212.9,24.329241564796114,RANGO / REVERSION (long gamma),71.42857142857143,72.32142857142857,rango_sostenido,ruptura_alcista,False,precio_actual_api
+,64843.36,80212.9,23.70256569061195,RANGO / REVERSION (long gamma),71.42857142857143,74.55357142857143,rango_sostenido,ruptura_alcista,False,precio_actual_api
+,64848.74,80212.9,23.692303042433817,RANGO / REVERSION (long gamma),71.42857142857143,74.55357142857143,rango_sostenido,ruptura_alcista,False,precio_actual_api
+,64644.81,80212.9,24.082505618007072,RANGO / REVERSION (long gamma),71.42857142857143,72.32142857142857,rango_sostenido,ruptura_alcista,False,precio_actual_api
+,64522.7,80212.9,24.317333279605467,RANGO / REVERSION (long gamma),71.42857142857143,72.32142857142857,rango_sostenido,ruptura_alcista,False,precio_actual_api
+,64599.08,80212.9,24.170344221620482,RANGO / REVERSION (long gamma),71.42857142857143,72.32142857142857,rango_sostenido,ruptura_alcista,False,precio_actual_api
+,64725.76,80212.9,23.92732043625288,RANGO / REVERSION (long gamma),71.42857142857143,72.32142857142857,rango_sostenido,ruptura_alcista,False,precio_actual_api
